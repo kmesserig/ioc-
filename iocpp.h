@@ -712,9 +712,23 @@ public:
 
 class IocppRegistration
 {
-public:
 private:
   std::shared_ptr<void> m_instance;
+
+public:
+  IocppRegistration() {}
+
+  template <class T>
+  std::shared_ptr<T> GetInstance()
+  {
+    return (T)m_instance;
+  }
+
+  template <class T>
+  void SetInstance(std::shared_ptr<T> instance)
+  {
+    m_instance = std::static_pointer_cast<void>(instance);
+  }
 };
 
 class Iocpp
@@ -722,8 +736,8 @@ class Iocpp
 private:
   static Iocpp *m_instance;
   std::mutex m_mapMutex;
-  std::map<std::string, IocppRegistration> m_registrations;
-  Iocpp() { m_registrations = std::map<std::string, IocppRegistration>(); };
+  std::map<std::string, std::shared_ptr<IocppRegistration>> m_registrations;
+  Iocpp() { m_registrations = std::map<std::string, std::shared_ptr<IocppRegistration>>(); };
   Iocpp(const Iocpp &iocpp){};
   ~Iocpp(){};
   class MemGuard
@@ -761,6 +775,7 @@ public:
   void Register(IocppLifeStyle pLifeStyle)
   {
     std::lock_guard<std::mutex> lock(m_mapMutex);
+    const char *key = typeid(TInterface).name();
 
     if (!std::is_base_of<TInterface, TImplementation>::value)
     {
@@ -770,15 +785,31 @@ public:
       throw IocppRegistrationException(msgStream.str());
     }
 
-    const char *key = typeid(TImplementation).name();
-
-    std::map<std::string, IocppRegistration>::iterator iter =
+    std::map<std::string, shared_ptr<IocppRegistration>>::iterator iMapping =
         m_registrations.find(key);
 
-    if (iter == m_registrations.end())
+    if (iMapping == m_registrations.end())
     {
-      m_registrations[key] = IocppRegistration();
+      shared_ptr<IocppRegistration> registration = make_shared<IocppRegistration>();
+      registration->SetInstance<TImplementation>(make_shared<TImplementation>());
+      m_registrations[key] = registration;
     }
+  }
+
+  template <class TInterface>
+  TInterface Resolve()
+  {
+    std::lock_guard<std::mutex> lock(m_mapMutex);
+    const char *key = typeid(TInterface).name();
+
+    std::map<std::string, std::shared_ptr<void>>::iterator iMapping = m_mapping.find(key);
+
+    if (iMapping != m_mapping.end())
+    {
+      return std::static_pointer_cast<TInterface>(iMapping->second);
+    }
+
+    throw IocppRegistrationException("Could not locate type in IOC");
   }
 };
 Iocpp *Iocpp::m_instance = NULL;

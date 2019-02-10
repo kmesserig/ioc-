@@ -8,12 +8,14 @@ using namespace iocpp;
 class A
 {
 public:
+	A() {}
 	virtual void Test() = 0;
 };
 
 class B : public A
 {
 public:
+	B() {}
 	void Test() { cout << "test" << endl; }
 };
 
@@ -31,13 +33,13 @@ int main(int argc, char **argv)
 			 << std::is_abstract<B>::value << endl;
 	Iocpp::Instance()->Register<A, B>();
 
-	try
+	/*try
 	{
 		Iocpp::Instance()->Register<B, C>();
 	}
 	catch (IocppRegistrationException e)
 	{
 		std::cerr << e.GetMessage() << endl;
-	}
+	}*/
 	return 0;
 }
