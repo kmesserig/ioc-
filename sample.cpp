@@ -5,32 +5,39 @@
 using namespace std;
 using namespace iocpp;
 
-class A {
+class A
+{
 public:
-  virtual void Test() = 0;
+	virtual void Test() = 0;
 };
 
-class B : public A {
+class B : public A
+{
 public:
-  void Test() { cout << "test" << endl; }
+	void Test() { cout << "test" << endl; }
 };
 
-class C {
+class C
+{
 public:
-  C(A *a) {}
+	C(A *a) {}
 };
 
-int main(int argc, char **argv) {
-  cout << "Hello" << endl
-       << Iocpp::Instance() << endl
-       << std::is_abstract<A>::value << endl
-       << std::is_abstract<B>::value << endl;
-  Iocpp::Instance()->Register<A, B>();
+int main(int argc, char **argv)
+{
+	cout << "Hello" << endl
+			 << Iocpp::Instance() << endl
+			 << std::is_abstract<A>::value << endl
+			 << std::is_abstract<B>::value << endl;
+	Iocpp::Instance()->Register<A, B>();
 
-  try {
-    Iocpp::Instance()->Register<B, C>();
-  } catch (IocppRegistrationException e) {
-    std::cerr << e.GetMessage() << endl;
-  }
-  return 0;
+	try
+	{
+		Iocpp::Instance()->Register<B, C>();
+	}
+	catch (IocppRegistrationException e)
+	{
+		std::cerr << e.GetMessage() << endl;
+	}
+	return 0;
 }
