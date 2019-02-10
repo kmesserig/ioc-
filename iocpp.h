@@ -632,7 +632,7 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    <one line to give the program's name and a brief idea of what it does.>
+    iocpp - A lightweight C++ IOC system
     Copyright (C) 2019  Kristopher Messerig
 
     This program is free software: you can redistribute it and/or modify
@@ -809,7 +809,10 @@ public:
       return std::static_pointer_cast<TInterface>(iMapping->second);
     }
 
-    throw IocppRegistrationException("Could not locate type in IOC");
+    std::stringstream msgStream;
+    msgStream << "Could not locate type in IOC for "
+              << typeid(TInterface).name();
+    throw IocppRegistrationException(msgStream.str());
   }
 };
 Iocpp *Iocpp::m_instance = NULL;
