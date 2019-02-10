@@ -16,8 +16,8 @@ public:
 };
 
 class C {
-  public:
-    C(A* a){}
+public:
+  C(A *a) {}
 };
 
 int main(int argc, char **argv) {
@@ -26,5 +26,11 @@ int main(int argc, char **argv) {
        << std::is_abstract<A>::value << endl
        << std::is_abstract<B>::value << endl;
   Iocpp::Instance()->Register<A, B>();
+
+  try {
+    Iocpp::Instance()->Register<B, C>();
+  } catch (IocppRegistrationException e) {
+    std::cerr << e.GetMessage() << endl;
+  }
   return 0;
 }
