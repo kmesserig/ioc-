@@ -4,9 +4,16 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <string>
 #include <type_traits>
 
+
 namespace iocpp {
+class IocppException {
+public:
+  std::string message;
+};
+
 class Iocpp {
 public:
   static Iocpp *Instance() {
@@ -20,7 +27,11 @@ public:
 
   template <class TInterface, class TImplementation> void Register() {
     std::cout << typeid(TInterface).name() << std::endl
-              << typeid(TImplementation).name() << endl;
+              << typeid(TImplementation).name() << endl
+              << std::is_base_of<TInterface, TImplementation>::value << endl;
+
+    if (!std::is_base_of<TInterface, TImplementation>::value) {
+    }
   }
 
 private:

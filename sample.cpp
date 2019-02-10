@@ -15,6 +15,11 @@ public:
   void Test() { cout << "test" << endl; }
 };
 
+class C {
+  public:
+    C(A* a){}
+};
+
 int main(int argc, char **argv) {
   cout << "Hello" << endl
        << Iocpp::Instance() << endl
