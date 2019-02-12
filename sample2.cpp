@@ -27,6 +27,20 @@ void Register()
         m_nodes[key] = node;
 }
 
+template<class TInterface, class TImplementation>
+void Register()
+{
+        const char *key = typeid(TInterface).name();
+        
+        
+        Node node = Node();
+        node.func = []()-> void* {
+            return (void*) new TImplementation();
+        };
+        
+        m_nodes[key] = node;
+}
+
 template<class T>
 Node Resolve()
 {
@@ -62,7 +76,7 @@ class Consumer
     public:
         Consumer()
         {
-            Node n = Resolve<Service>();
+            Node n = Resolve<IService>();
             m_service = (IService) n.func();
             cout<<"Instance created default"<<endl;
         }
@@ -82,7 +96,7 @@ class Consumer
 int main()
 {
         Register<Consumer>();
-        Register<Service>();
+        Register<IService, Service>();
         Node n = Resolve<Consumer>();
         
         Consumer P = (Consumer)n.func() ;
