@@ -61,7 +61,7 @@ class IService
         virtual void Work(){};
 };
 
-class Service : IService
+class Service
 {
     public:
         Service(){}
@@ -72,12 +72,12 @@ class Service : IService
 class Consumer
 {
     private:
-        IService m_service;
+        Service m_service;
     public:
         Consumer()
         {
-            Node n = Resolve<IService>();
-            m_service = (IService) n.func();
+            Node n = Resolve<Service>();
+            m_service = (Service) n.func();
             cout<<"Instance created default"<<endl;
         }
         
@@ -96,7 +96,7 @@ class Consumer
 int main()
 {
         Register<Consumer>();
-        Register<IService, Service>();
+        Register<Service>();
         Node n = Resolve<Consumer>();
         
         Consumer P = (Consumer)n.func() ;
