@@ -11,16 +11,16 @@ typedef struct NODE{
     function<void*()> func;
 }Node;
 
-map<string, Node> m_nodes;
+map<string, Node> m_nodes = map<string, Node>();
 
 template<class T>
 void Register()
 {
         const char *key = typeid(T).name();
-        m_nodes = map<string, Node>();
+        
         
         Node node = Node();
-        node.func = [&]()-> void* {
+        node.func = []()-> void* {
             return (void*) new T();
         };
         
@@ -28,37 +28,54 @@ void Register()
 }
 
 template<class T>
-void* Resolve()
+Node Resolve()
 {
     const char *key = typeid(T).name();
-    return m_nodes[key].func();
+    map<string, Node>::iterator iMapping = m_nodes.find(key);
+
+    if (iMapping != m_nodes.end())
+    {
+      return iMapping->second;
+    }
 }
 
-
-class Person
+class Service
 {
     public:
-        Person()
+        Service(){}
+        Service(void* p){Service();}
+        void Work(){cout<<"Worked"<<endl;}
+};
+class Consumer
+{
+    private:
+        Service m_service;
+    public:
+        Consumer()
         {
+            Node n = Resolve<Service>();
+            m_service = (Service) n.func();
             cout<<"Instance created default"<<endl;
         }
         
-        Person(void* p)
+        Consumer(void* _)
         {
-            cout<<"Instance created"<<endl;
+            Consumer();
         }
         
         void doSomeThing()
         {
             cout<<"Done something"<<endl;
+            m_service.Work();
         }
 };
 
 int main()
 {
-        Register<Person>();
+        Register<Consumer>();
+        Register<Service>();
+        Node n = Resolve<Consumer>();
         
-        void* p = Resolve<Person>();
-        Person pP = static_cast<Person>(p);
-        pP.doSomeThing();
+        Consumer P = (Consumer)n.func() ;
+        P.doSomeThing();
 }
