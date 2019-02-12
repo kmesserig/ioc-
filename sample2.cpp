@@ -39,22 +39,31 @@ Node Resolve()
     }
 }
 
-class Service
+class IService
+{
+    public:
+        IService(){}
+        IService(void* _){}
+        virtual void Work(){};
+};
+
+class Service : IService
 {
     public:
         Service(){}
         Service(void* p){Service();}
-        void Work(){cout<<"Worked"<<endl;}
+        void Work() {cout<<"Worked"<<endl;}
 };
+
 class Consumer
 {
     private:
-        Service m_service;
+        IService m_service;
     public:
         Consumer()
         {
             Node n = Resolve<Service>();
-            m_service = (Service) n.func();
+            m_service = (IService) n.func();
             cout<<"Instance created default"<<endl;
         }
         
